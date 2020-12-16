@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <!--    <title>Material Design Bootstrap</title>-->
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        function deleteClass(e) {
+            let idClass = e.getAttribute("href");
+            $.ajax({
+                type: "DELETE",
+                url: "/classes/" + idClass,
+                success: function (data) {
+                    successHandler();
+                }
+            })
+            event.preventDefault();
+        }
+        function editClass(e) {
+            let idClass = e.getAttribute("href");
+            let className = $('#newName').val();
+            let newClass = {
+                name: className
+            };
+            // goi ajax
+            $.ajax({
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                type:"PUT",
+                data: JSON.stringify(newClass),
+                //tên API
+                url:"/classes/" + idClass,
+                //xử lý khi thành công
+                success: successHandler
+
+            });
+            //chặn sự kiện mặc định của thẻ
+            event.preventDefault();
+        }
+
+        function searchClass() {
+            let searchName = $('#searchName').val();
+            // let newClass = {
+            //     name: className
+            // };
+            // goi ajax
+            $.ajax({
+                type:"GET",
+                // data: JSON.stringify(searchName),
+                //tên API
+                url:`/classes?name=${searchName}`,
+                //xử lý khi thành công
+                success: function (data) {
+                    // hien thi danh sach o day
+                    let content = '    <tr>\n' +
+                        '        <td>ten lop</td>\n' +
+                        '        <td>Action</td>\n' +
+                        '    </tr>';
+                    for (let i = 0; i < data.length; i++) {
+                        content += getClass(data[i]);
+                    }
+                    document.getElementById('classList').innerHTML = content;
+                }
+
+            });
+            //chặn sự kiện mặc định của thẻ
+            event.preventDefault();
+        }
+
+        function sortClass() {
+            $.ajax({
+                type: "GET",
+                url: "/classes/sort",
+                success: function (data) {
+                    let content = '    <tr>\n' +
+                        '        <td>ten lop</td>\n' +
+                        '        <td>Action</td>\n' +
+                        '    </tr>';
+                    for (let i = 0; i < data.length; i++) {
+                        content += getClass(data[i]);
+                    }
+                    document.getElementById('classList').innerHTML = content;
+                }
+            })
+
+            event.preventDefault();
+        }
+
+        function successHandler() {
+            $.ajax({
+                type: "GET",
+                //tên API
+                url: "/classes",
+                //xử lý khi thành công
+                success: function (data) {
+                    // hien thi danh sach o day
+                    let content = '    <tr>\n' +
+                        '        <td>ten lop</td>\n' +
+                        '        <td>Action</td>\n' +
+                        '    </tr>';
+                    for (let i = 0; i < data.length; i++) {
+                        content += getClass(data[i]);
+                    }
+                    document.getElementById('classList').innerHTML = content;
+                }
+            });
+        }
+
+        function getClass(classe1) {
+            return `<tr><td >${classe1.name}</td>` +
+                `<td><a onclick="deleteClass(this)" href="${classe1.id}">delete</a></td>` +
+                `<td><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal${classe1.id}">edit</button>
+
+                    <div id="exampleModal${classe1.id}" class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-sm">
+                            <div class="modal-content">
+                                <form>
+                                    <div class="form-group">
+                                        <label>Name</label>
+                                        <input type="text" class="form-control" id="newName" aria-describedby="emailHelp"
+                                              value = "${classe1.name}">
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button href="${classe1.id}" type="button" class="btn btn-secondary" data-dismiss="modal" onclick="editClass(this)">edit</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div></td></tr>`;
+        }
+
+
+        function addClass() {
+            let className = $('#className').val();
+            let newClass = {
+                name: className
+            };
+            // goi ajax
+            $.ajax({
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                type:"POST",
+                data: JSON.stringify(newClass),
+                //tên API
+                url:"/classes/",
+                //xử lý khi thành công
+                success: successHandler
+
+            });
+            //chặn sự kiện mặc định của thẻ
+            event.preventDefault();
+        }
+    </script>
+</head>
+<body>
+<!--tìm kiếm-->
+<form>
+    <input type="text" id="searchName">
+    <input type="button" value="Search" onclick="searchClass()">
+</form>
+<!--//tìm kiếm-->
+
+<button onclick="sortClass()">Sort</button>
+
+<!-- creat class -->
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+    Create new class
+</button>
+
+<!-- Chuyển Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Create new class form</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form>
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" class="form-control" id="className" aria-describedby="emailHelp"
+                           placeholder="Enter name">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="addClass()">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+<!-- /create class -->
+
+<h1>Danh sach lop</h1>
+
+<table id="classList">
+    <tr>
+        <td>ten lop</td>
+        <td>Action</td>
+    </tr>
+    <th:block th:each="c: ${list}">
+        <tr>
+
+            <td th:text="${c.name}"></td>
+            <td><a th:href="${c.id}" onclick="deleteClass(this)">delete</a></td>
+            <td>
+                <button type="button" class="btn btn-primary" data-toggle="modal" th:attr="data-target='#exampleModal'+${c.id}" >edit</button>
+                <!--chuyen sang modal-->
+                <div th:attr="id='exampleModal'+${c.id}" class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-sm">
+                        <div class="modal-content">
+                            <form>
+                                <div class="form-group">
+                                    <label>Name</label>
+                                    <input type="text" class="form-control" id="newName" aria-describedby="emailHelp"
+                                           th:value="${c.name}">
+                                </div>
+                                <div class="modal-footer">
+                                    <button th:href="${c.id}" type="button" class="btn btn-secondary" data-dismiss="modal" onclick="editClass(this)">edit</button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+
+            </td>
+        </tr>
+    </th:block>
+</table>
+
+
+
+
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
+</body>
+</html>

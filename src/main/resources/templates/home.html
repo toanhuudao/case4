@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form action="#" th:action="@{/create}" th:object="${emptyList}" method="post">
+    dientich:
+    <input type="text"  name="area" th:value="*{area}" />
+    <br>
+    Name:
+    <select th:field="*{cityName}">
+        <option th:each="i : ${country}" th:value="${i.name}" th:text="${i.name}">
+        </option>
+    </select>
+    <br>
+    mieuta:
+    <input type="text"  name="description" th:value="*{description}" />
+    <br>
+    danso"
+    <input type="text" name="population" th:value="*{population}" />
+    <br>
+    gdp:
+    <input type="text" name="gdp" th:value="*{gdp}" />
+    <input type="submit" value="subbbbmitttt">
+</form>
+
+
+<br>
+<table >
+    <thead>
+    </thead>
+
+    <tbody>
+    <tr th:each="l : ${list}">
+        <td th:text="${l.getArea()}"></td>
+        <td th:text="${l.getCityName()}"></td>
+        <td th:text="${l.getDescription()}"></td>
+        <td th:text="${l.getPopulation()}"></td>
+        <td th:text="${l.getGdp()}"></td>
+        <td><a th:href="@{/delete/__${l.getId()}__}" >delete</a></td>
+        <td><a th:href="@{/fix/__${l.getId()}__}" >fix</a></td>
+        
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
